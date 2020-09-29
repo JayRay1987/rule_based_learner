@@ -1,0 +1,38 @@
+url = 'https://raw.githubusercontent.com/JayRay1987/MLwR/master/Machine%20Learning%20with%20R%20(3rd%20Ed.)/Chapter05/mushrooms.csv'
+#since all 22 features and target class are nominal we set stringsAsFactors to true
+#read csv
+mushrooms <- read.csv(url, header = TRUE, stringsAsFactors = TRUE)
+#check the structure of mushroom data set
+str(mushrooms)
+#drop veil_type as only has one level
+mushrooms$veil_type <- NULL
+#check the distribution of the types of mushrooms
+table(mushrooms$type)
+#4208 edible and 3916 poisonous
+round(prop.table(table(mushrooms$type)*100), digits = 2)
+#roughly 50/50 split in data set between edible and poisonous
+#train the model
+#install 1R packages first.
+install.packages("RWeka")
+library(RWeka)
+#1 rule classification
+# ~., considers all features in the data set
+mushroom_1R <- OneR(type ~., data = mushrooms)
+#to examine the rules the model created:
+mushroom_1R
+#in short, if the mushroom smells unappetizing it is poisonous
+#summary of model
+summary(mushroom_1R)
+#examining the table we see that 1R classifier classified 120 poisonous mushrooms
+#as edible. A big mistake!
+#0 edible mushrooms were misclassified as poisonous.
+#as it only used one feature I guess it is a positive start.
+#let's try a more sophisticated learner, namely: JRip.
+#first train the model
+mushroom_JRip <- JRip(type ~., data =mushrooms)
+#examine the rules
+mushroom_JRip
+#9 rules to distinguish poisonous mushrooms from edible mushrooms.
+#for example, if type odor is foul then mushroom is poisonous.
+#for example, if gill size is narrow and odor is pungent then mushroom is poisonous.
+#if mushroom doesn't meet one of these rules then we can say mushroom is edible.
